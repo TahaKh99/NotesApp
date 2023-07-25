@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String userID = FirebaseAuth.instance.currentUser!.uid;
   bool showDetails = true;
+  int? selectedNoteIndex;
 
 
 
@@ -104,11 +105,53 @@ class _HomeScreenState extends State<HomeScreen> {
           itemBuilder: (context, index) {
             var note = notes[index];
             bool isLastNote = index == notes.length - 1;
+            bool isLongPressed = selectedNoteIndex == index;
 
             return Column(
               children: [
                 ListTile(
+                  trailing: SizedBox(
+                    width: isLongPressed? 110.0:20,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
 
+                        Visibility(
+                          visible: isLongPressed,
+                          child: IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () {
+                              // Navigate to the EditScreen with the selected note
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => EditScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
+                        Visibility(
+                          visible: isLongPressed,
+                          child: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.blue),
+                            onPressed: () {
+                              // Delete the selected note from Firestore
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(userID)
+                                  .collection("notes").doc(note.id).delete();
+                              setState(() {
+
+                              });
+
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   title: Text(note.title ?? ''),
                   subtitle: showDetails? Text(note.content ?? ''):
                   null,
@@ -116,8 +159,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   },
                   onLongPress: () {
-
-                    },
+                    setState(() {
+                      selectedNoteIndex = isLongPressed ? null : index;
+                    });
+                  },
                 ),
                 if (!isLastNote)
                   const Divider( // Add a divider after each ListTile except for the last one
