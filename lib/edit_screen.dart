@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:map_exam/note.dart';
+
+import 'home_screen.dart';
 
 class EditScreen extends StatefulWidget {
   static Route route() => MaterialPageRoute(builder: (_) =>  const EditScreen());
 
   final Note? note;
   final String mode;
-  final String? userID;
 
-  const EditScreen({Key? key,  this.note, this.mode = 'view', this.userID}) : super(key: key);
+  const EditScreen({Key? key,  this.note, this.mode = 'view'}) : super(key: key);
 
   @override
   State<EditScreen> createState() => _EditScreenState();
@@ -18,6 +20,7 @@ class EditScreen extends StatefulWidget {
 class _EditScreenState extends State<EditScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  String userID = FirebaseAuth.instance.currentUser!.uid;
 
 
   @override
@@ -48,6 +51,86 @@ class _EditScreenState extends State<EditScreen> {
     return widget.mode == 'edit' || widget.mode == 'add';
   }
 
+
+
+  void _saveNote() {
+    String title = _titleController.text;
+    String content = _descriptionController.text;
+
+    if (widget.mode == 'add') {
+      // Check if the user document exists in Firestore
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(userID)
+          .get()
+          .then((userDoc) {
+        if (userDoc.exists) {
+          // If the user document exists, add the note to the 'notes' collection
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(userID)
+              .collection('notes')
+              .add({
+            'title': title,
+            'content': content,
+          }).then((_) {
+            // After saving, navigate back to the previous screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const HomeScreen(),
+              ),
+            );
+          });
+        } else {
+          // If the user document doesn't exist, create the user document and add the note to the 'notes' collection
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(userID)
+              .set({})
+              .then((_) {
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(userID)
+                .collection('notes')
+                .add({
+              'title': title,
+              'content': content,
+            }).then((_) {
+              // After saving, navigate back to the previous screen
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const HomeScreen(),
+                ),
+              );
+            });
+          });
+        }
+      });
+    } else if (widget.mode == 'edit') {
+      // Update existing note in Firestore collection for notes
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(userID)
+          .collection('notes')
+          .doc(widget.note!.id)
+          .update({
+        'title': title,
+        'content': content,
+      }).then((_) {
+        // After saving, navigate back to the previous screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const HomeScreen(),
+          ),
+        );
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,8 +146,8 @@ class _EditScreenState extends State<EditScreen> {
                 size: 30,
               ),
               onPressed: () {
-                // Perform save operation based on the mode (edit or add)
-                // ...
+                _saveNote();
+
               },
             ),
           IconButton(
