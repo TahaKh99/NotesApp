@@ -14,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String userID = FirebaseAuth.instance.currentUser!.uid;
+  bool showDetails = true;
 
 
 
@@ -109,8 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ListTile(
 
                   title: Text(note.title ?? ''),
-                  subtitle: Text(note.content ?? ''),
-
+                  subtitle: showDetails? Text(note.content ?? ''):
+                  null,
                   onTap: () {
 
                   },
@@ -139,10 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
         FloatingActionButton(
           heroTag: "showDetails",
           key: UniqueKey(), // Unique key for the first FloatingActionButton
-          child: Icon(Icons.close_fullscreen),
+          child: showDetails? Icon(Icons.close_fullscreen): Icon(Icons.menu),
           tooltip: 'Show less. Hide notes content',
           onPressed: () {
-
+            setState(() {
+              showDetails = !showDetails;
+            });
           },
         ),
         const SizedBox(width: 16), // Add some space between the FloatingActionButtons
