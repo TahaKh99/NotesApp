@@ -1,5 +1,5 @@
 class Note {
-  final dynamic id;
+  dynamic id;
   String? title;
   String? content;
 
