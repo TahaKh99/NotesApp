@@ -14,8 +14,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String userID = FirebaseAuth.instance.currentUser!.uid;
-  bool showDetails = true;
   int? selectedNoteIndex;
+  bool showDetails = true;
+  String? noteID;
 
 
 
@@ -39,7 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return notes;
   }
 
-
+  void _openEditScreen(BuildContext context, {String? noteId, String mode = 'view'}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditScreen(noteId: noteId, mode: mode),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +112,9 @@ class _HomeScreenState extends State<HomeScreen> {
           itemCount: notes.length,
           itemBuilder: (context, index) {
             var note = notes[index];
-            bool isLastNote = index == notes.length - 1;
+            noteID = note.id;
             bool isLongPressed = selectedNoteIndex == index;
+            bool isLastNote = index == notes.length - 1;
 
             return Column(
               children: [
@@ -121,14 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: IconButton(
                             icon: const Icon(Icons.edit, color: Colors.blue),
                             onPressed: () {
-                              // Navigate to the EditScreen with the selected note
-                              // Delete and reflect was included in commit 4
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const EditScreen(),
-                                ),
-                              );
+                              _openEditScreen(context, noteId: note.id, mode: 'edit');
                             },
                           ),
                         ),
@@ -156,7 +158,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: Text(note.title ?? ''),
                   subtitle: showDetails? Text(note.content ?? ''):
                   null,
+
                   onTap: () {
+                    _openEditScreen(context, noteId: note.id, mode: 'view');
 
                   },
                   onLongPress: () {
@@ -186,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
         FloatingActionButton(
           heroTag: "showDetails",
           key: UniqueKey(), // Unique key for the first FloatingActionButton
-          child: showDetails? Icon(Icons.close_fullscreen): Icon(Icons.menu),
+          child: showDetails? const Icon(Icons.close_fullscreen): const Icon(Icons.menu),
           tooltip: 'Show less. Hide notes content',
           onPressed: () {
             setState(() {
@@ -202,13 +206,8 @@ class _HomeScreenState extends State<HomeScreen> {
           tooltip: 'Add a new note',
           onPressed: () {
             // Navigate to the EditScreen to add a new note
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const EditScreen(),
-              ),
-            );
-          },
+            _openEditScreen(context, noteId: noteID, mode: 'Add');
+            },
         ),
       ],
     );
