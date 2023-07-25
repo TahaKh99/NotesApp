@@ -122,10 +122,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: const Icon(Icons.edit, color: Colors.blue),
                             onPressed: () {
                               // Navigate to the EditScreen with the selected note
+                              // Delete and reflect was included in commit 4
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => EditScreen(),
+                                  builder: (_) => const EditScreen(),
                                 ),
                               );
                             },
