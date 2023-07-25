@@ -40,11 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return notes;
   }
 
-  void _openEditScreen(BuildContext context, {String? noteId, String mode = 'view'}) {
+  void _openEditScreen(BuildContext context, {Note? note, String mode = 'view'}) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EditScreen(noteId: noteId, mode: mode),
+        builder: (_) => EditScreen(note: note, mode: mode),
       ),
     );
   }
@@ -130,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: IconButton(
                             icon: const Icon(Icons.edit, color: Colors.blue),
                             onPressed: () {
-                              _openEditScreen(context, noteId: note.id, mode: 'edit');
+                              _openEditScreen(context, note: notes[index], mode: 'edit');
                             },
                           ),
                         ),
@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   null,
 
                   onTap: () {
-                    _openEditScreen(context, noteId: note.id, mode: 'view');
+                    _openEditScreen(context, note: notes[index], mode: 'view');
 
                   },
                   onLongPress: () {
@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           tooltip: 'Add a new note',
           onPressed: () {
             // Navigate to the EditScreen to add a new note
-            _openEditScreen(context, noteId: noteID, mode: 'add');
+            _openEditScreen(context, mode: 'add');
             },
         ),
       ],
