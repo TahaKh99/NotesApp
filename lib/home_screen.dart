@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           tooltip: 'Add a new note',
           onPressed: () {
             // Navigate to the EditScreen to add a new note
-            _openEditScreen(context, noteId: noteID, mode: 'Add');
+            _openEditScreen(context, noteId: noteID, mode: 'add');
             },
         ),
       ],

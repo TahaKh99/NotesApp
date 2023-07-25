@@ -16,14 +16,29 @@ class _EditScreenState extends State<EditScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+
+  String get screenTitle {
+    switch (widget.mode) {
+      case 'view':
+        return 'View Note';
+      case 'edit':
+        return 'Edit Note';
+      case 'add':
+        return 'Add New Note';
+      default:
+        return 'View Note';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
         centerTitle: true,
-        title: const Text('App Bar Title'),
+        title: Text(screenTitle),
         actions: [
+          if (widget.mode != 'view')
           IconButton(
               icon: const Icon(
                 Icons.check_circle,
